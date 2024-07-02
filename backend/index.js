@@ -1,5 +1,6 @@
 import express from 'express';
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
+import cors from 'cors'; // Import CORS package
 import authRoutes from './routes/auth.route.js';
 import userRoutes from './routes/user.route.js';
 import postRoutes from './routes/post.route.js';
@@ -19,18 +20,18 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-
 const app = express();
 
 const PORT = process.env.PORT || 3000;
 
 const __dirname= path.resolve()
 
+// Apply CORS middleware
+app.use(cors());
+
 app.use(express.json({limit: '5mb'}));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
@@ -39,6 +40,7 @@ app.use("/api/posts", postRoutes);
 app.use("/api/notifications", notificationRoutes); 
 app.use('/api/doctors', doctorRoutes)
 app.use('/api/schedules', scheduleRoutes)
+
 if (process.env.NODE_ENV === "production") {
 	app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
@@ -47,10 +49,7 @@ if (process.env.NODE_ENV === "production") {
 	});
 }
 
-
-    app.listen(3000, () => {
+app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   connectMongoDB();
-
 });
-
